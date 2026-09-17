@@ -1,0 +1,42 @@
+$color-primario: #1b3a57;
+$color-fondo: #f7f7f9;
+$espaciado: 1rem;
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: $color-fondo;
+  color: #222;
+}
+
+.header {
+  background: $color-primario;
+  color: white;
+  padding: $espaciado * 1.5;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+main {
+  padding: $espaciado * 1.5;
+}
+
+.grid-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $espaciado;
+}
+
+.producto-card {
+  background: white;
+  border-radius: 8px;
+  padding: $espaciado;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .precio {
+    font-weight: bold;
+    color: $color-primario;
+  }
+}
