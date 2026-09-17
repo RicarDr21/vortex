@@ -17,6 +17,26 @@ body {
   h1 {
     margin: 0;
   }
+
+  .estado-api {
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+
+  nav {
+    margin-top: $espaciado * 0.5;
+    display: flex;
+    gap: $espaciado;
+
+    a {
+      color: white;
+      text-decoration: none;
+
+      &.router-link-active {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 main {
@@ -27,6 +47,7 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: $espaciado;
+  margin-top: $espaciado;
 }
 
 .producto-card {
@@ -38,5 +59,36 @@ main {
   .precio {
     font-weight: bold;
     color: $color-primario;
+  }
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $espaciado * 0.5;
+  margin-bottom: $espaciado;
+
+  input,
+  select {
+    padding: 0.4rem;
+  }
+
+  button {
+    background: $color-primario;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
   }
 }
