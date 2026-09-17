@@ -15,7 +15,7 @@ Backend y frontend viven en este mismo repositorio pero son dos proyectos indepe
 ```
 vortex/
   backend/    -> API REST (Node.js + Express + MongoDB Atlas)
-  frontend/   -> catálogo, carrito, panel admin (HTML + JS vanilla + SCSS + Vite)
+  frontend/   -> catálogo, carrito, panel admin (Vue + Vue Router + SCSS + Vite)
 ```
 
 ## Cómo correrlo
