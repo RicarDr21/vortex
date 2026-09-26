@@ -6,16 +6,16 @@ Backend y frontend viven en este mismo repositorio pero son dos proyectos indepe
 
 ## Integrantes
 
-- Santiago Antolinez — backend
-- Caren Diaz — frontend
-- David Hernández — integración, documentación y despliegue
+- Santiago Antolinez 
+- Caren Diaz
+- David Hernández 
 
 ## Estructura
 
 ```
 vortex/
   backend/    -> API REST (Node.js + Express + MongoDB Atlas)
-  frontend/   -> catálogo, carrito, panel admin (HTML + JS vanilla + SCSS + Vite)
+  frontend/   -> catálogo, carrito, panel admin (Vue + Vue Router + SCSS + Vite)
 ```
 
 ## Cómo correrlo
