@@ -6,9 +6,9 @@ Backend y frontend viven en este mismo repositorio pero son dos proyectos indepe
 
 ## Integrantes
 
-- Santiago Antolinez — 
-- Caren Diaz — 
-- David Hernández — 
+- Santiago Antolinez 
+- Caren Diaz
+- David Hernández 
 
 ## Estructura
 
