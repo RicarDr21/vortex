@@ -39,4 +39,12 @@ npm run dev
 
 El frontend espera el backend corriendo en `http://localhost:3001`.
 
-Cada carpeta tiene su propio README con más detalle.
+
+## Estado del proyecto por semana
+
+- **Semana 11**: modelos, conexión a MongoDB Atlas y endpoints REST documentados con Swagger (`/api-docs`) — completo.
+- **Semana 12**: CRUD completo de categorías y productos, verificado de punta a punta:
+  - Creación y eliminación de categorías y productos vía Postman/Swagger
+  - Catálogo del frontend consumiendo la API real, con filtro por categoría funcionando
+  - Panel de administrador (crear/eliminar producto) sincronizado en tiempo real con el catálogo, sin recargar la página
+  - Completo.
