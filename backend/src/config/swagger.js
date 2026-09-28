@@ -12,6 +12,12 @@ const options = {
       { url: "http://localhost:3001/api", description: "Servidor local" },
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+        },
+      },
       schemas: {
         Categoria: {
           type: "object",

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const categoriasController = require("../controllers/categorias.controller");
+const verificarToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -31,8 +32,10 @@ router.get("/", categoriasController.listar);
  * @swagger
  * /categorias:
  *   post:
- *     summary: Crea una nueva categoría
+ *     summary: Crea una nueva categoría (requiere autenticación)
  *     tags: [Categorias]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -42,15 +45,19 @@ router.get("/", categoriasController.listar);
  *     responses:
  *       201:
  *         description: Categoría creada
+ *       401:
+ *         description: No autorizado
  */
-router.post("/", categoriasController.crear);
+router.post("/", verificarToken, categoriasController.crear);
 
 /**
  * @swagger
  * /categorias/{id}:
  *   put:
- *     summary: Actualiza una categoría existente
+ *     summary: Actualiza una categoría existente (requiere autenticación)
  *     tags: [Categorias]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -66,17 +73,21 @@ router.post("/", categoriasController.crear);
  *     responses:
  *       200:
  *         description: Categoría actualizada
+ *       401:
+ *         description: No autorizado
  *       404:
  *         description: Categoría no encontrada
  */
-router.put("/:id", categoriasController.actualizar);
+router.put("/:id", verificarToken, categoriasController.actualizar);
 
 /**
  * @swagger
  * /categorias/{id}:
  *   delete:
- *     summary: Elimina una categoría
+ *     summary: Elimina una categoría (requiere autenticación)
  *     tags: [Categorias]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -86,9 +97,11 @@ router.put("/:id", categoriasController.actualizar);
  *     responses:
  *       200:
  *         description: Categoría eliminada
+ *       401:
+ *         description: No autorizado
  *       404:
  *         description: Categoría no encontrada
  */
-router.delete("/:id", categoriasController.eliminar);
+router.delete("/:id", verificarToken, categoriasController.eliminar);
 
 module.exports = router;

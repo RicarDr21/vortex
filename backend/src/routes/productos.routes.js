@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const productosController = require("../controllers/productos.controller");
+const verificarToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -38,8 +39,10 @@ router.get("/", productosController.listar);
  * @swagger
  * /productos:
  *   post:
- *     summary: Crea un nuevo producto
+ *     summary: Crea un nuevo producto (requiere autenticación)
  *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -49,15 +52,19 @@ router.get("/", productosController.listar);
  *     responses:
  *       201:
  *         description: Producto creado
+ *       401:
+ *         description: No autorizado
  */
-router.post("/", productosController.crear);
+router.post("/", verificarToken, productosController.crear);
 
 /**
  * @swagger
  * /productos/{id}:
  *   put:
- *     summary: Actualiza un producto existente
+ *     summary: Actualiza un producto existente (requiere autenticación)
  *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -73,17 +80,21 @@ router.post("/", productosController.crear);
  *     responses:
  *       200:
  *         description: Producto actualizado
+ *       401:
+ *         description: No autorizado
  *       404:
  *         description: Producto no encontrado
  */
-router.put("/:id", productosController.actualizar);
+router.put("/:id", verificarToken, productosController.actualizar);
 
 /**
  * @swagger
  * /productos/{id}:
  *   delete:
- *     summary: Elimina un producto
+ *     summary: Elimina un producto (requiere autenticación)
  *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -93,9 +104,11 @@ router.put("/:id", productosController.actualizar);
  *     responses:
  *       200:
  *         description: Producto eliminado
+ *       401:
+ *         description: No autorizado
  *       404:
  *         description: Producto no encontrado
  */
-router.delete("/:id", productosController.eliminar);
+router.delete("/:id", verificarToken, productosController.eliminar);
 
 module.exports = router;
