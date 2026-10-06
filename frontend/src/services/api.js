@@ -90,6 +90,15 @@ export async function crearCategoria(categoria) {
   return res.json();
 }
 
+export async function actualizarCategoria(id, categoria) {
+  const res = await fetch(`${API_URL}/categorias/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...headersAuth() },
+    body: JSON.stringify(categoria),
+  });
+  return res.json();
+}
+
 export async function eliminarCategoria(id) {
   const res = await fetch(`${API_URL}/categorias/${id}`, {
     method: "DELETE",

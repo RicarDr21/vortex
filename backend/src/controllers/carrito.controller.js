@@ -15,8 +15,16 @@ exports.obtener = async (req, res) => {
     const { sessionId } = req.params;
     const carrito = await obtenerOCrearCarrito(sessionId);
     const items = await ItemCarrito.find({ carritoId: carrito._id }).populate("productoId");
-    const total = items.reduce((suma, item) => suma + item.precioUnitario * item.cantidad, 0);
-    res.json({ carritoId: carrito._id, items, total });
+
+    // Items cuyo producto ya fue borrado por el admin: se eliminan del carrito
+    const huerfanos = items.filter((item) => !item.productoId);
+    if (huerfanos.length > 0) {
+      await ItemCarrito.deleteMany({ _id: { $in: huerfanos.map((item) => item._id) } });
+    }
+
+    const itemsValidos = items.filter((item) => item.productoId);
+    const total = itemsValidos.reduce((suma, item) => suma + item.precioUnitario * item.cantidad, 0);
+    res.json({ carritoId: carrito._id, items: itemsValidos, total });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

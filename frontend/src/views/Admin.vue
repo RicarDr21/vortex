@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import {
   obtenerProductos, crearProducto, actualizarProducto, eliminarProducto,
-  obtenerCategorias, crearCategoria, eliminarCategoria,
+  obtenerCategorias, crearCategoria, actualizarCategoria, eliminarCategoria,
   login, logout, estaAutenticado,
 } from "../services/api";
 
@@ -14,6 +14,7 @@ const errorLogin = ref("");
 const productos = ref([]);
 const categorias = ref([]);
 const editandoId = ref(null);
+const editandoCategoriaId = ref(null);
 
 const formProducto = ref({
   nombre: "", precio: 0, stock: 0, talla: "M", color: "", genero: "unisex", categoriaId: "",
@@ -75,10 +76,24 @@ async function borrarProducto(id) {
   await cargarDatos();
 }
 
-async function agregarCategoria() {
-  await crearCategoria(nuevaCategoria.value);
+function limpiarFormCategoria() {
   nuevaCategoria.value = { nombre: "", descripcion: "" };
+  editandoCategoriaId.value = null;
+}
+
+async function guardarCategoria() {
+  if (editandoCategoriaId.value) {
+    await actualizarCategoria(editandoCategoriaId.value, nuevaCategoria.value);
+  } else {
+    await crearCategoria(nuevaCategoria.value);
+  }
+  limpiarFormCategoria();
   await cargarDatos();
+}
+
+function editarCategoria(cat) {
+  editandoCategoriaId.value = cat._id;
+  nuevaCategoria.value = { nombre: cat.nombre, descripcion: cat.descripcion || "" };
 }
 
 async function borrarCategoria(id) {
@@ -142,11 +157,12 @@ onMounted(() => {
       </tbody>
     </table>
 
-    <h3>Categorías</h3>
-    <form @submit.prevent="agregarCategoria">
+    <h3>{{ editandoCategoriaId ? "Editar categoría" : "Nueva categoría" }}</h3>
+    <form @submit.prevent="guardarCategoria">
       <input v-model="nuevaCategoria.nombre" placeholder="Nombre de categoría" required />
       <input v-model="nuevaCategoria.descripcion" placeholder="Descripción" />
-      <button type="submit">Agregar categoría</button>
+      <button type="submit">{{ editandoCategoriaId ? "Guardar cambios" : "Agregar categoría" }}</button>
+      <button v-if="editandoCategoriaId" type="button" @click="limpiarFormCategoria">Cancelar</button>
     </form>
 
     <table>
@@ -154,6 +170,7 @@ onMounted(() => {
         <tr v-for="cat in categorias" :key="cat._id">
           <td>{{ cat.nombre }}</td>
           <td>{{ cat.descripcion }}</td>
+          <td><button @click="editarCategoria(cat)">Editar</button></td>
           <td><button @click="borrarCategoria(cat._id)">Eliminar</button></td>
         </tr>
       </tbody>

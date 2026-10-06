@@ -6,9 +6,9 @@ Backend y frontend viven en este mismo repositorio pero son dos proyectos indepe
 
 ## Integrantes
 
-- Santiago Antolinez 
+- Santiago Antolinez
 - Caren Diaz
-- David Hernández 
+- David Hernández
 
 ## Estructura
 
@@ -26,7 +26,7 @@ Necesitas dos terminales abiertas, una por proyecto.
 ```bash
 cd backend
 npm install
-cp .env.example .env   # y poner ahí la URI real de MongoDB Atlas
+cp .env.example .env   # y poner ahí la URI real de MongoDB Atlas y las credenciales del admin
 npm run dev
 ```
 
@@ -38,7 +38,7 @@ npm run dev
 ```
 
 El frontend espera el backend corriendo en `http://localhost:3001`.
-
+La documentación de la API (Swagger) está en `http://localhost:3001/api-docs`.
 
 ## Estado del proyecto por semana
 
@@ -48,3 +48,14 @@ El frontend espera el backend corriendo en `http://localhost:3001`.
   - Catálogo del frontend consumiendo la API real, con filtro por categoría funcionando
   - Panel de administrador (crear/eliminar producto) sincronizado en tiempo real con el catálogo, sin recargar la página
   - Completo.
+- **Semana 13**: carrito de compras y panel de administrador:
+  - Carrito con agregar, quitar y modificar cantidades; el total se calcula en el backend
+  - Si el admin borra un producto que está en un carrito, el item se elimina del carrito sin romper la página
+  - Panel de administrador con login y CRUD completo de productos y categorías (crear, listar, editar y eliminar)
+  - Completo.
+
+## Pendiente
+
+- Semana 14: seguridad (HTTPS, XSS, CSRF)
+- Semana 15: integración final, pruebas y documentación técnica
+- Semana 16: despliegue y sustentación

@@ -21,15 +21,15 @@ Abrir `http://localhost:5173` en el navegador (con el backend ya corriendo).
 ```
 index.html                 -> punto de montaje de Vue
 src/
-  main.js                   -> arranque de la app
-  App.vue                    -> layout y navegación
-  router/index.js             -> rutas: catálogo, carrito, admin
+  main.js                  -> arranque de la app
+  App.vue                  -> layout y navegación
+  router/index.js          -> rutas: catálogo, carrito, admin
   views/
-    Catalogo.vue               -> catálogo público, filtra por categoría
-    Carrito.vue                 -> carrito de compras (pendiente semana 13)
-    Admin.vue                    -> panel de administrador (crear/eliminar productos)
-  services/api.js               -> funciones que llaman al backend
-  styles/main.scss               -> estilos con SCSS
+    Catalogo.vue           -> catálogo público, filtra por categoría
+    Carrito.vue            -> carrito de compras (agregar, quitar, cambiar cantidad, total)
+    Admin.vue              -> panel de administrador (login y CRUD de productos y categorías)
+  services/api.js          -> funciones que llaman al backend
+  styles/main.scss         -> estilos con SCSS
 ```
 
-Pendiente: carrito de compras conectado a la API, editar productos (hoy solo crea y elimina), estilos del panel admin.
+Pendiente: seguridad (HTTPS, XSS, CSRF) y despliegue.
