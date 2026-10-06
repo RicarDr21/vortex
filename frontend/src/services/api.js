@@ -1,4 +1,27 @@
-const API_URL = "http://localhost:3001/api";
+const apiPorDefecto = import.meta.env.PROD
+  ? `${window.location.origin}/api`
+  : "http://localhost:3001/api";
+const API_URL = (import.meta.env.VITE_API_URL || apiPorDefecto).replace(
+  /\/$/,
+  "",
+);
+
+async function solicitud(path, opciones = {}) {
+  const respuesta = await fetch(`${API_URL}${path}`, opciones);
+  const datos = respuesta.headers
+    .get("content-type")
+    ?.includes("application/json")
+    ? await respuesta.json()
+    : {};
+
+  if (!respuesta.ok) {
+    throw new Error(
+      datos.mensaje || `La solicitud falló (${respuesta.status}).`,
+    );
+  }
+
+  return datos;
+}
 
 function obtenerSessionId() {
   let sessionId = localStorage.getItem("vortex_session_id");
@@ -40,99 +63,90 @@ export function logout() {
 }
 
 export async function obtenerEstado() {
-  const res = await fetch(`${API_URL}/health`);
-  return res.json();
+  return solicitud("/health");
 }
 
 export async function obtenerProductos(categoriaId) {
-  const url = categoriaId ? `${API_URL}/productos?categoriaId=${categoriaId}` : `${API_URL}/productos`;
-  const res = await fetch(url);
-  return res.json();
+  const query = categoriaId
+    ? `?categoriaId=${encodeURIComponent(categoriaId)}`
+    : "";
+  return solicitud(`/productos${query}`);
 }
 
 export async function crearProducto(producto) {
-  const res = await fetch(`${API_URL}/productos`, {
+  return solicitud("/productos", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headersAuth() },
     body: JSON.stringify(producto),
   });
-  return res.json();
 }
 
 export async function actualizarProducto(id, producto) {
-  const res = await fetch(`${API_URL}/productos/${id}`, {
+  return solicitud(`/productos/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", ...headersAuth() },
     body: JSON.stringify(producto),
   });
-  return res.json();
 }
 
 export async function eliminarProducto(id) {
-  const res = await fetch(`${API_URL}/productos/${id}`, {
+  return solicitud(`/productos/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: { ...headersAuth() },
   });
-  return res.json();
 }
 
 export async function obtenerCategorias() {
-  const res = await fetch(`${API_URL}/categorias`);
-  return res.json();
+  return solicitud("/categorias");
 }
 
 export async function crearCategoria(categoria) {
-  const res = await fetch(`${API_URL}/categorias`, {
+  return solicitud("/categorias", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...headersAuth() },
     body: JSON.stringify(categoria),
   });
-  return res.json();
 }
 
 export async function actualizarCategoria(id, categoria) {
-  const res = await fetch(`${API_URL}/categorias/${id}`, {
+  return solicitud(`/categorias/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json", ...headersAuth() },
     body: JSON.stringify(categoria),
   });
-  return res.json();
 }
 
 export async function eliminarCategoria(id) {
-  const res = await fetch(`${API_URL}/categorias/${id}`, {
+  return solicitud(`/categorias/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: { ...headersAuth() },
   });
-  return res.json();
 }
 
 export async function obtenerCarrito() {
   const sessionId = obtenerSessionId();
-  const res = await fetch(`${API_URL}/carrito/${sessionId}`);
-  return res.json();
+  return solicitud(`/carrito/${encodeURIComponent(sessionId)}`);
 }
 
 export async function agregarAlCarrito(productoId, cantidad = 1) {
   const sessionId = obtenerSessionId();
-  const res = await fetch(`${API_URL}/carrito/${sessionId}/items`, {
+  return solicitud(`/carrito/${encodeURIComponent(sessionId)}/items`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ productoId, cantidad }),
   });
-  return res.json();
 }
 
 export async function actualizarCantidadCarrito(itemId, cantidad) {
-  const res = await fetch(`${API_URL}/carrito/items/${itemId}`, {
+  return solicitud(`/carrito/items/${encodeURIComponent(itemId)}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cantidad }),
   });
-  return res.json();
 }
 
 export async function eliminarDelCarrito(itemId) {
-  const res = await fetch(`${API_URL}/carrito/items/${itemId}`, { method: "DELETE" });
-  return res.json();
+  return solicitud(`/carrito/items/${encodeURIComponent(itemId)}`, {
+    method: "DELETE",
+  });
 }
