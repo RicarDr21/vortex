@@ -150,3 +150,17 @@ export async function eliminarDelCarrito(itemId) {
     method: "DELETE",
   });
 }
+
+export async function subirImagen(archivo) {
+  const datos = new FormData();
+  datos.append("imagen", archivo);
+  const respuesta = await fetch(`${API_URL}/api/productos/imagen`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${obtenerToken()}` }, // NO pongas Content-Type
+    body: datos,
+  });
+  const cuerpo = await respuesta.json();
+  if (!respuesta.ok) throw new Error(cuerpo.mensaje || "No se pudo subir la imagen");
+  return cuerpo;
+}
+
