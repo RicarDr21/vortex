@@ -7,8 +7,13 @@ export default defineConfig(({ mode }) => {
   const apiUrl =
     entorno.VITE_API_URL || (desarrollo ? "http://localhost:3001/api" : "");
   const conexiones = ["'self'"];
+  // blob: = vista previa de la imagen elegida; origen del API = imágenes en /uploads
+  const imagenes = ["'self'", "data:", "blob:", "https:"];
 
-  if (apiUrl) conexiones.push(new URL(apiUrl).origin);
+  if (apiUrl) {
+    conexiones.push(new URL(apiUrl).origin);
+    imagenes.push(new URL(apiUrl).origin);
+  }
   if (desarrollo) {
     conexiones.push(
       "ws://localhost:5173",
@@ -23,7 +28,7 @@ export default defineConfig(({ mode }) => {
     "base-uri 'self'",
     "form-action 'self'",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https:",
+    `img-src ${imagenes.join(" ")}`,
     "object-src 'none'",
     "script-src 'self'",
     `style-src 'self' ${desarrollo ? "'unsafe-inline' " : ""}https://fonts.googleapis.com`,

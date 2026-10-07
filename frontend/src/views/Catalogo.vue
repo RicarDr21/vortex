@@ -6,6 +6,7 @@ import {
   agregarAlCarrito,
 } from "../services/api";
 
+const imagenesFallidas = ref({});
 const productos = ref([]);
 const categorias = ref([]);
 const categoriaSeleccionada = ref("");
@@ -147,9 +148,16 @@ onMounted(async () => {
         <div
           class="product-art"
           :class="`tone-${indice % 4}`"
-          aria-hidden="true"
         >
-          <span class="product-art-mark">V.</span>
+          <img
+            v-if="producto.imagen && !imagenesFallidas[producto._id]"
+            class="product-art-image"
+            :src="producto.imagen"
+            :alt="producto.nombre"
+            loading="lazy"
+            @error="imagenesFallidas[producto._id] = true"
+          />
+          <span v-else class="product-art-mark">V.</span>
           <span class="product-art-caption">VORTEX / 2026</span>
           <span class="product-tag">{{
             producto.stock > 0 ? "Disponible" : "Agotado"

@@ -6,6 +6,7 @@ import {
   actualizarProducto,
   eliminarProducto,
   obtenerCategorias,
+  subirImagen,
   crearCategoria,
   actualizarCategoria,
   eliminarCategoria,
@@ -22,6 +23,9 @@ const error = ref("");
 const aviso = ref("");
 const pestana = ref("productos");
 const guardando = ref(false);
+const subiendoImagen = ref(false);
+const archivoImagen = ref(null);
+const vistaPrevia = ref("");
 
 const productos = ref([]);
 const categorias = ref([]);
@@ -31,6 +35,7 @@ const editandoCategoriaId = ref(null);
 const formProducto = ref({
   nombre: "",
   descripcion: "",
+  imagen: "",
   precio: 0,
   stock: 0,
   talla: "M",
@@ -79,6 +84,7 @@ function limpiarFormProducto() {
   formProducto.value = {
     nombre: "",
     descripcion: "",
+    imagen: "",
     precio: 0,
     stock: 0,
     talla: "M",
@@ -87,12 +93,37 @@ function limpiarFormProducto() {
     categoriaId: "",
   };
   editandoId.value = null;
+  archivoImagen.value = null;
+  vistaPrevia.value = "";
+}
+
+function elegirImagen(evento) {
+  const archivo = evento.target.files?.[0];
+  if (!archivo) return;
+  if (!["image/jpeg", "image/png", "image/webp"].includes(archivo.type)) {
+    error.value = "Solo se permiten imágenes JPG, PNG o WEBP.";
+    evento.target.value = "";
+    return;
+  }
+  if (archivo.size > 2 * 1024 * 1024) {
+    error.value = "La imagen supera los 2 MB.";
+    evento.target.value = "";
+    return;
+  }
+  error.value = "";
+  archivoImagen.value = archivo;
+  vistaPrevia.value = URL.createObjectURL(archivo);
 }
 
 async function guardarProducto() {
   guardando.value = true;
   error.value = "";
   try {
+    if (archivoImagen.value) {
+      subiendoImagen.value = true;
+      const { url } = await subirImagen(archivoImagen.value);
+      formProducto.value.imagen = url;
+    }
     if (editandoId.value) {
       await actualizarProducto(editandoId.value, formProducto.value);
       aviso.value = "Producto actualizado.";
@@ -105,15 +136,19 @@ async function guardarProducto() {
   } catch (err) {
     error.value = err.message || "No se pudo guardar el producto.";
   } finally {
+    subiendoImagen.value = false;
     guardando.value = false;
   }
 }
 
 function editarProducto(producto) {
   editandoId.value = producto._id;
+  archivoImagen.value = null;
+  vistaPrevia.value = producto.imagen || "";
   formProducto.value = {
     nombre: producto.nombre,
     descripcion: producto.descripcion || "",
+    imagen: producto.imagen || "",
     precio: producto.precio,
     stock: producto.stock,
     talla: producto.talla,
@@ -295,6 +330,22 @@ onMounted(() => {
               placeholder="Detalle breve de la prenda"
               maxlength="240"
           /></label>
+          <div class="field-wide">
+            <label for="imagen-producto">Imagen del producto</label>
+            <input
+              id="imagen-producto"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              @change="elegirImagen"
+            />
+            <small>JPG, PNG o WEBP · máx. 2 MB</small>
+            <img
+              v-if="vistaPrevia"
+              :src="vistaPrevia"
+              alt="Vista previa"
+              style="max-width: 120px; margin-top: 0.5rem"
+            />
+          </div>
           <label
             >Precio<input
               v-model.number="formProducto.precio"
@@ -349,7 +400,9 @@ onMounted(() => {
             >
               {{
                 guardando
-                  ? "Guardando..."
+                  ? subiendoImagen
+                    ? "Subiendo imagen..."
+                    : "Guardando..."
                   : editandoId
                     ? "Guardar cambios"
                     : "Publicar producto"
@@ -390,6 +443,11 @@ onMounted(() => {
               <tr v-for="producto in productos" :key="producto._id">
                 <td data-label="Producto">
                   <div class="table-product">
+                    <img
+                      v-if="producto.imagen"
+                      :src="producto.imagen"
+                      :alt="producto.nombre"
+                    />
                     <span>{{ producto.nombre }}</span>
                   </div>
                 </td>
@@ -506,4 +564,3 @@ onMounted(() => {
     </div>
   </section>
 </template>
-
