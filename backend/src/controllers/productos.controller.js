@@ -40,4 +40,13 @@ async function eliminar(req, res) {
   }
 }
 
-module.exports = { listar, crear, actualizar, eliminar };
+
+function subirImagen(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ mensaje: "No se recibió ninguna imagen" });
+  }
+  const base = process.env.PUBLIC_URL || `${req.protocol}://${req.get("host")}`;
+  res.status(201).json({ url: `${base}/uploads/${req.file.filename}` });
+}
+
+module.exports = { listar, crear, actualizar, eliminar, subirImagen };
