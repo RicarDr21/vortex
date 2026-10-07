@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const productosController = require("../controllers/productos.controller");
 const verificarToken = require("../middleware/auth.middleware");
+const upload = require("../middleware/subirImagen.middleware");
 
 /**
  * @swagger
@@ -34,6 +35,60 @@ const verificarToken = require("../middleware/auth.middleware");
  *                 $ref: '#/components/schemas/Producto'
  */
 router.get("/", productosController.listar);
+
+/**
+ * @swagger
+ * /productos/imagen:
+ *   post:
+ *     summary: Sube la imagen de un producto (requiere autenticación)
+ *     description: Acepta JPG, PNG o WEBP de hasta 2 MB. Devuelve la URL pública de la imagen, que luego se envía en el campo `imagen` al crear o editar un producto.
+ *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [imagen]
+ *             properties:
+ *               imagen:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Imagen guardada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   example: http://localhost:3001/uploads/3f2a9c1e-5b7d-4e8a-9c0d-1a2b3c4d5e6f.jpg
+ *       400:
+ *         description: Archivo ausente, tipo no permitido o mayor a 2 MB
+ *       401:
+ *         description: No autorizado
+ */
+router.post(
+  "/imagen",
+  verificarToken,
+  (req, res, next) => {
+    upload.single("imagen")(req, res, (err) => {
+      if (err) {
+        const mensaje =
+          err.code === "LIMIT_FILE_SIZE"
+            ? "La imagen supera los 2 MB"
+            : err.message;
+        return res.status(400).json({ mensaje });
+      }
+      next();
+    });
+  },
+  productosController.subirImagen,
+);
 
 /**
  * @swagger
