@@ -1,11 +1,13 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
   obtenerProductos,
   crearProducto,
   actualizarProducto,
   eliminarProducto,
   obtenerCategorias,
+  obtenerPedidos,
+  actualizarEstadoPedido,
   subirImagen,
   crearCategoria,
   actualizarCategoria,
@@ -29,6 +31,10 @@ const vistaPrevia = ref("");
 
 const productos = ref([]);
 const categorias = ref([]);
+const pedidos = ref([]);
+const filtroEstado = ref("");
+const pedidoAbierto = ref(null);
+const estadosPedido = ["pendiente", "enviado", "entregado", "cancelado"];
 const editandoId = ref(null);
 const editandoCategoriaId = ref(null);
 
@@ -49,9 +55,10 @@ const nuevaCategoria = ref({ nombre: "", descripcion: "" });
 async function cargarDatos() {
   error.value = "";
   try {
-    [productos.value, categorias.value] = await Promise.all([
+    [productos.value, categorias.value, pedidos.value] = await Promise.all([
       obtenerProductos(),
       obtenerCategorias(),
+      obtenerPedidos(),
     ]);
   } catch (err) {
     error.value = err.message || "No se pudieron cargar los datos.";
@@ -213,6 +220,38 @@ async function borrarCategoria(id) {
   }
 }
 
+const pedidosVisibles = computed(() =>
+  filtroEstado.value
+    ? pedidos.value.filter((p) => p.estado === filtroEstado.value)
+    : pedidos.value,
+);
+
+function formatoPrecio(valor) {
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(valor || 0);
+}
+
+function formatoFecha(fecha) {
+  return new Date(fecha).toLocaleString("es-CO", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+async function cambiarEstadoPedido(pedido, estado) {
+  error.value = "";
+  try {
+    const actualizado = await actualizarEstadoPedido(pedido._id, estado);
+    pedido.estado = actualizado.estado;
+    aviso.value = "Estado del pedido actualizado.";
+  } catch (err) {
+    error.value = err.message || "No se pudo cambiar el estado.";
+  }
+}
+
 onMounted(() => {
   if (autenticado.value) cargarDatos();
 });
@@ -307,6 +346,14 @@ onMounted(() => {
         @click="pestana = 'categorias'"
       >
         Categorías <span>{{ categorias.length }}</span>
+      </button>
+      <button
+        :class="{ 'is-selected': pestana === 'pedidos' }"
+        role="tab"
+        :aria-selected="pestana === 'pedidos'"
+        @click="pestana = 'pedidos'"
+      >
+        Pedidos <span>{{ pedidos.length }}</span>
       </button>
     </div>
 
@@ -490,7 +537,10 @@ onMounted(() => {
       </section>
     </div>
 
-    <div v-else class="admin-workspace category-workspace">
+    <div
+      v-else-if="pestana === 'categorias'"
+      class="admin-workspace category-workspace"
+    >
       <section class="admin-form-section">
         <p class="eyebrow eyebrow-dark">ORGANIZA LA TIENDA</p>
         <h2>
@@ -562,5 +612,106 @@ onMounted(() => {
         </p>
       </section>
     </div>
+
+    <section v-else class="inventory-section orders-section">
+      <div class="section-topline">
+        <div>
+          <p class="eyebrow eyebrow-dark">HISTORIAL</p>
+          <h2>Pedidos</h2>
+        </div>
+        <label class="orders-filter"
+          >Estado
+          <select v-model="filtroEstado">
+            <option value="">Todos</option>
+            <option v-for="e in estadosPedido" :key="e" :value="e">
+              {{ e }}
+            </option>
+          </select>
+        </label>
+      </div>
+      <div v-if="pedidosVisibles.length" class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Pedido</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Pago</th>
+              <th>Estado</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="pedido in pedidosVisibles" :key="pedido._id">
+              <tr>
+                <td data-label="Pedido">
+                  <strong>#{{ pedido._id.slice(-6).toUpperCase() }}</strong
+                  ><br /><small>{{ formatoFecha(pedido.fecha) }}</small>
+                </td>
+                <td data-label="Cliente">
+                  {{ pedido.cliente.nombre }}<br /><small>{{
+                    pedido.cliente.telefono
+                  }}</small>
+                </td>
+                <td data-label="Total">{{ formatoPrecio(pedido.total) }}</td>
+                <td data-label="Pago">{{ pedido.metodoPago }}</td>
+                <td data-label="Estado">
+                  <select
+                    :value="pedido.estado"
+                    :aria-label="`Estado del pedido ${pedido._id.slice(-6)}`"
+                    @change="cambiarEstadoPedido(pedido, $event.target.value)"
+                  >
+                    <option v-for="e in estadosPedido" :key="e" :value="e">
+                      {{ e }}
+                    </option>
+                  </select>
+                </td>
+                <td data-label="Detalle">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      @click="
+                        pedidoAbierto =
+                          pedidoAbierto === pedido._id ? null : pedido._id
+                      "
+                    >
+                      {{ pedidoAbierto === pedido._id ? "Ocultar" : "Ver" }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="pedidoAbierto === pedido._id" class="order-detail">
+                <td colspan="6">
+                  <p>
+                    <strong>Entrega:</strong> {{ pedido.cliente.direccion }},
+                    {{ pedido.cliente.ciudad }}
+                    <template v-if="pedido.cliente.notas">
+                      · <em>{{ pedido.cliente.notas }}</em>
+                    </template>
+                  </p>
+                  <ul>
+                    <li v-for="(item, i) in pedido.items" :key="i">
+                      {{ item.cantidad }} × {{ item.nombre }}
+                      <span v-if="item.color || item.talla">
+                        ({{ item.color }} · Talla {{ item.talla }})
+                      </span>
+                      — {{ formatoPrecio(item.precioUnitario * item.cantidad) }}
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+      <p v-else class="admin-empty">
+        {{
+          pedidos.length
+            ? "No hay pedidos con ese estado."
+            : "Aún no hay pedidos. Aparecerán aquí cuando un cliente confirme su compra."
+        }}
+      </p>
+    </section>
   </section>
 </template>
+

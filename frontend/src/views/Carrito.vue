@@ -11,6 +11,7 @@ const total = ref(0);
 const cargando = ref(true);
 const error = ref("");
 const actualizandoId = ref("");
+const imagenesFallidas = ref({});
 
 function formatoPrecio(valor) {
   return new Intl.NumberFormat("es-CO", {
@@ -89,12 +90,16 @@ onMounted(cargarCarrito);
           class="cart-item"
         >
           <div class="cart-product">
-            <div
-              class="cart-product-mark"
-              :class="`tone-${indice % 4}`"
-              aria-hidden="true"
-            >
-              V.
+            <div class="cart-product-mark" :class="`tone-${indice % 4}`">
+              <img
+                v-if="
+                  item.productoId?.imagen && !imagenesFallidas[item._id]
+                "
+                :src="item.productoId.imagen"
+                :alt="item.productoId.nombre"
+                @error="imagenesFallidas[item._id] = true"
+              />
+              <span v-else aria-hidden="true">V.</span>
             </div>
             <div>
               <h2>{{ item.productoId?.nombre || "Producto Vortex" }}</h2>
@@ -155,16 +160,11 @@ onMounted(cargarCarrito);
         <div class="summary-total">
           <span>Total parcial</span><strong>{{ formatoPrecio(total) }}</strong>
         </div>
-        <button
-          class="button button-dark"
-          type="button"
-          disabled
-          title="La compra en línea estará disponible próximamente"
-        >
+        <RouterLink class="button button-dark" to="/compra">
           Finalizar compra <span aria-hidden="true">↗</span>
-        </button>
+        </RouterLink>
         <p class="summary-note">
-          Los pagos en línea estarán disponibles próximamente.
+          Ingresarás tus datos de entrega en el siguiente paso.
         </p>
       </aside>
     </div>

@@ -27,6 +27,42 @@ const options = {
             descripcion: { type: "string" },
           },
         },
+        Pedido: {
+          type: "object",
+          properties: {
+            _id: { type: "string" },
+            sessionId: { type: "string" },
+            cliente: {
+              type: "object",
+              properties: {
+                nombre: { type: "string" },
+                telefono: { type: "string" },
+                ciudad: { type: "string" },
+                direccion: { type: "string" },
+                notas: { type: "string" },
+              },
+            },
+            metodoPago: { type: "string", enum: ["Contra entrega", "Transferencia bancaria", "Pago en tienda"] },
+            items: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  productoId: { type: "string" },
+                  nombre: { type: "string" },
+                  color: { type: "string" },
+                  talla: { type: "string" },
+                  imagen: { type: "string" },
+                  cantidad: { type: "number" },
+                  precioUnitario: { type: "number" },
+                },
+              },
+            },
+            total: { type: "number" },
+            estado: { type: "string", enum: ["pendiente", "enviado", "entregado", "cancelado"] },
+            fecha: { type: "string", format: "date-time" },
+          },
+        },
         Producto: {
           type: "object",
           properties: {

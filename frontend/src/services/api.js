@@ -163,3 +163,25 @@ export async function subirImagen(archivo) {
   if (!respuesta.ok) throw new Error(cuerpo.mensaje || "No se pudo subir la imagen");
   return cuerpo;
 }
+
+export async function crearPedido(datos) {
+  const sessionId = obtenerSessionId();
+  return solicitud(`/pedidos/${encodeURIComponent(sessionId)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(datos),
+  });
+}
+
+export async function obtenerPedidos(estado) {
+  const query = estado ? `?estado=${encodeURIComponent(estado)}` : "";
+  return solicitud(`/pedidos${query}`, { headers: { ...headersAuth() } });
+}
+
+export async function actualizarEstadoPedido(id, estado) {
+  return solicitud(`/pedidos/${encodeURIComponent(id)}/estado`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...headersAuth() },
+    body: JSON.stringify({ estado }),
+  });
+}

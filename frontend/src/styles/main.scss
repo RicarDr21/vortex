@@ -676,6 +676,14 @@ select:focus-visible {
   color: var(--ink);
   font: 500 27px/1 var(--display);
 }
+.cart-product-mark {
+  overflow: hidden;
+}
+.cart-product-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .cart-product-mark.tone-1 {
   background: var(--blue);
 }
@@ -1553,4 +1561,33 @@ textarea:focus-visible {
   margin: 6px 0 0;
   color: var(--muted);
   font-size: 9px;
+}
+
+.orders-section {
+  grid-column: 1 / -1;
+}
+.orders-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.orders-filter select {
+  min-width: 140px;
+}
+.data-table small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.data-table select {
+  min-width: 120px;
+  text-transform: capitalize;
+}
+.order-detail td {
+  background: rgba(23, 33, 37, 0.03);
+  font-size: 12px;
+}
+.order-detail ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
 }

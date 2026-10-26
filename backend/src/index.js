@@ -9,6 +9,7 @@ const categoriasRoutes = require("./routes/categorias.routes");
 const productosRoutes = require("./routes/productos.routes");
 const carritoRoutes = require("./routes/carrito.routes");
 const authRoutes = require("./routes/auth.routes");
+const pedidosRoutes = require("./routes/pedidos.routes");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/categorias", categoriasRoutes);
 app.use("/api/productos", productosRoutes);
 app.use("/api/carrito", carritoRoutes);
+app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3001;

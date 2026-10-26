@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import { obtenerCarrito, eliminarDelCarrito } from "../../../vortex/frontend/src/services/api";
+import { obtenerCarrito, crearPedido } from "../services/api";
 
 const metodos = ["Contra entrega", "Transferencia bancaria", "Pago en tienda"];
 
@@ -9,6 +9,8 @@ const total = ref(0);
 const cargando = ref(true);
 const error = ref("");
 const confirmado = ref(false);
+const enviando = ref(false);
+const pedidoCreado = ref(null);
 
 const form = reactive({
   nombre: "",
@@ -42,12 +44,22 @@ function validar() {
 async function confirmar() {
   if (!validar()) return;
   error.value = "";
+  enviando.value = true;
   try {
-    // Vacía el carrito al confirmar el pedido
-    await Promise.all(items.value.map((i) => eliminarDelCarrito(i._id)));
+    // El servidor guarda el pedido con los productos del carrito y lo vacía
+    pedidoCreado.value = await crearPedido({
+      nombre: form.nombre,
+      telefono: form.telefono,
+      ciudad: form.ciudad,
+      direccion: form.direccion,
+      notas: form.notas,
+      metodoPago: form.metodoPago,
+    });
     confirmado.value = true;
   } catch (err) {
     error.value = err.message || "No se pudo registrar el pedido.";
+  } finally {
+    enviando.value = false;
   }
 }
 
@@ -82,6 +94,9 @@ onMounted(async () => {
     <div v-if="confirmado" class="empty-state">
       <span class="empty-mark">V.</span>
       <h2>¡Pedido registrado!</h2>
+      <p v-if="pedidoCreado">
+        Pedido n.º {{ pedidoCreado._id.slice(-6).toUpperCase() }}
+      </p>
       <p>
         Lo enviaremos a {{ form.direccion }}, {{ form.ciudad }}.<br />
         Método de pago: {{ form.metodoPago }}.
@@ -172,7 +187,7 @@ onMounted(async () => {
         </fieldset>
 
         <div class="form-actions field-wide">
-          <button type="submit" class="button button-dark">
+          <button type="submit" class="button button-dark" :disabled="enviando">
             Confirmar pedido <span aria-hidden="true">↗</span>
           </button>
         </div>
